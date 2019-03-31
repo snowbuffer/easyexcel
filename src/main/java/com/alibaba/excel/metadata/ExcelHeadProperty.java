@@ -3,7 +3,6 @@ package com.alibaba.excel.metadata;
 import com.alibaba.excel.annotation.ExcelColumnNum;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.exception.ExcelAnalysisException;
-import sun.reflect.misc.ReflectUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -118,7 +117,9 @@ public class ExcelHeadProperty {
             }
 
             if (!p.convertor().equals(TypeConverter.class)) {
-                excelHeadProperty.setConverter((TypeConverter) ReflectUtil.newInstance(p.convertor()));
+                Class<? extends TypeConverter> convertor = p.convertor();
+                TypeConverter typeConverter = convertor.newInstance();
+                excelHeadProperty.setConverter(typeConverter);
             }
         } catch (InstantiationException e) {
             throw new ExcelAnalysisException("InstantiationException is happen : {}" , e);

@@ -1,5 +1,7 @@
 package com.alibaba.excel.annotation;
 
+import com.alibaba.excel.metadata.TypeConverter;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -33,4 +35,12 @@ public @interface ExcelProperty {
       * @return
       */
      String format() default "";
+
+     /**
+      * 自定义类型转换器
+      *
+      * @return
+      */
+     Class<? extends TypeConverter> convertor() default TypeConverter.class;
+
 }

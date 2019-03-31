@@ -1,7 +1,10 @@
 package com.alibaba.excel.util;
 
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.metadata.ExcelColumnProperty;
 import com.alibaba.excel.metadata.ExcelHeadProperty;
+import com.alibaba.excel.metadata.RowErrorModel;
+import com.alibaba.excel.metadata.TypeConverter;
 import net.sf.cglib.beans.BeanMap;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 
@@ -40,7 +43,13 @@ public class TypeUtil {
         return n;
     }
 
-    public static Object convert(String value, Field field, String format, boolean us) {
+    public static Object convert(String value, Field field, String format, TypeConverter converter, boolean us) {
+
+        // 转换器存在情况下，直接走转换器
+        if (converter != null) {
+            return converter.convertToRead(value);
+        }
+
         if (!StringUtils.isEmpty(value)) {
             if (Float.class.equals(field.getType())) {
                 return Float.parseFloat(value);
@@ -207,10 +216,16 @@ public class TypeUtil {
         return simpleDateFormat.format(cellValue);
     }
 
-    public static String getFieldStringValue(BeanMap beanMap, String fieldName, String format) {
+    public static String getFieldStringValue(BeanMap beanMap, String fieldName, String format, TypeConverter converter) {
         String cellValue = null;
         Object value = beanMap.get(fieldName);
         if (value != null) {
+
+            // 如果存在转换器，直接走转换器
+            if (converter != null) {
+                return converter.convertToWrite(value);
+            }
+
             if (value instanceof Date) {
                 cellValue = TypeUtil.formatDate((Date)value, format);
             } else {
@@ -220,13 +235,26 @@ public class TypeUtil {
         return cellValue;
     }
 
-    public static Map getFieldValues(List<String> stringList, ExcelHeadProperty excelHeadProperty, Boolean use1904WindowDate) {
+    public static Map getFieldValues(List<String> stringList, ExcelHeadProperty excelHeadProperty, Boolean use1904WindowDate, Map<String, RowErrorModel.CellInfo> rowErrorMap) {
+        if (rowErrorMap == null) {
+            throw new ExcelAnalysisException(" rowErroMap is null, abort");
+        }
+
         Map map = new HashMap();
+
         for (int i = 0; i < stringList.size(); i++) {
             ExcelColumnProperty columnProperty = excelHeadProperty.getExcelColumnProperty(i);
             if (columnProperty != null) {
-                Object value = TypeUtil.convert(stringList.get(i), columnProperty.getField(),
-                    columnProperty.getFormat(), use1904WindowDate);
+                Object value = null;
+                String currentValue = stringList.get(i);
+                try {
+                    value = TypeUtil.convert(currentValue, columnProperty.getField(),
+                            columnProperty.getFormat(), columnProperty.getConverter(), use1904WindowDate);
+                } catch (Exception e) {
+                    List<String> currentHead = columnProperty.getHead();
+                    // TODO 是否需要设置必填项  不需要，解析工具只负责将excel值转成对应bean, 有些业务场景没有必要耦合进来
+                    rowErrorMap.put(currentHead.get(currentHead.size() - 1), RowErrorModel.CellInfo.newInstance(currentValue, "格式不正确"));
+                }
                 if (value != null) {
                     map.put(columnProperty.getField().getName(),value);
                 }

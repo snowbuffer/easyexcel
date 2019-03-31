@@ -3,6 +3,7 @@ package com.alibaba.easyexcel.test;
 import com.alibaba.easyexcel.test.listen.ExcelListener;
 import com.alibaba.easyexcel.test.model.ReadModel;
 import com.alibaba.easyexcel.test.model.ReadModel2;
+import com.alibaba.easyexcel.test.model.test.Student;
 import com.alibaba.easyexcel.test.util.FileUtil;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.ExcelReader;
@@ -63,9 +64,9 @@ public class ReadTest {
      */
     @Test
     public void saxReadJavaModelV2007() throws IOException {
-        InputStream inputStream = FileUtil.getResourcesFileInputStream("2007.xlsx");
+        InputStream inputStream = FileUtil.getResourcesFileInputStream("import_student_templet.xlsx");
         ExcelListener excelListener = new ExcelListener();
-        EasyExcelFactory.readBySax(inputStream, new Sheet(2, 1, ReadModel.class), excelListener);
+        EasyExcelFactory.readBySax(inputStream, new Sheet(1, 1, Student.class), excelListener);
         inputStream.close();
     }
 
@@ -79,7 +80,7 @@ public class ReadTest {
         InputStream inputStream = FileUtil.getResourcesFileInputStream("2007.xlsx");
         ExcelListener excelListener = new ExcelListener();
         ExcelReader excelReader = EasyExcelFactory.getReader(inputStream,excelListener);
-        List<Sheet> sheets = excelReader.getSheets();
+        List<Sheet> sheets = excelReader.getSheets(); // 用于读取所有的sheet
         System.out.println("llll****"+sheets);
         System.out.println();
         for (Sheet sheet:sheets) {
@@ -120,8 +121,8 @@ public class ReadTest {
      */
     @Test
     public void simpleReadJavaModelV2003() throws IOException {
-        InputStream inputStream = FileUtil.getResourcesFileInputStream("2003.xls");
-        List<Object> data = EasyExcelFactory.read(inputStream, new Sheet(2, 1, ReadModel.class));
+        InputStream inputStream = FileUtil.getResourcesFileInputStream("import_student_templet.xls");
+        List<Object> data = EasyExcelFactory.read(inputStream, new Sheet(1, 1, Student.class));
         inputStream.close();
         print(data);
     }
@@ -133,9 +134,9 @@ public class ReadTest {
      */
     @Test
     public void saxReadListStringV2003() throws IOException {
-        InputStream inputStream = FileUtil.getResourcesFileInputStream("2003.xls");
+        InputStream inputStream = FileUtil.getResourcesFileInputStream("import_student_templet.xls");
         ExcelListener excelListener = new ExcelListener();
-        EasyExcelFactory.readBySax(inputStream, new Sheet(2, 1), excelListener);
+        EasyExcelFactory.readBySax(inputStream, new Sheet(1, 1), excelListener);
         inputStream.close();
     }
 
@@ -146,9 +147,9 @@ public class ReadTest {
      */
     @Test
     public void saxReadJavaModelV2003() throws IOException {
-        InputStream inputStream = FileUtil.getResourcesFileInputStream("2003.xls");
+        InputStream inputStream = FileUtil.getResourcesFileInputStream("import_student_templet.xls");
         ExcelListener excelListener = new ExcelListener();
-        EasyExcelFactory.readBySax(inputStream, new Sheet(2, 1, ReadModel.class), excelListener);
+        EasyExcelFactory.readBySax(inputStream, new Sheet(1, 1, Student.class), excelListener);
         inputStream.close();
     }
 

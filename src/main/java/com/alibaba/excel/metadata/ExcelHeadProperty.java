@@ -2,9 +2,11 @@ package com.alibaba.excel.metadata;
 
 import com.alibaba.excel.annotation.ExcelColumnNum;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.util.StringUtils;
+import com.alibaba.excel.exception.ExcelAnalysisException;
+import sun.reflect.misc.ReflectUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -59,6 +61,12 @@ public class ExcelHeadProperty {
             }
             //对列排序
             Collections.sort(columnPropertyList);
+
+            // 重新排序 0 -> n
+            for (int i = 0; i < columnPropertyList.size(); i++) {
+                ExcelColumnProperty excelColumnProperty = columnPropertyList.get(i);
+                excelColumnProperty.setIndex(i);
+            }
             if (head == null || head.size() == 0) {
                 for (ExcelColumnProperty excelColumnProperty : columnPropertyList) {
                     headList.add(excelColumnProperty.getHead());
@@ -80,6 +88,9 @@ public class ExcelHeadProperty {
             excelHeadProperty.setHead(Arrays.asList(p.value()));
             excelHeadProperty.setIndex(p.index());
             excelHeadProperty.setFormat(p.format());
+            if (p.convertor() != null) {
+                addConvertor(p, excelHeadProperty);
+            }
             excelColumnPropertyMap1.put(p.index(), excelHeadProperty);
         } else {
             ExcelColumnNum columnNum = f.getAnnotation(ExcelColumnNum.class);
@@ -88,6 +99,9 @@ public class ExcelHeadProperty {
                 excelHeadProperty.setField(f);
                 excelHeadProperty.setIndex(columnNum.value());
                 excelHeadProperty.setFormat(columnNum.format());
+                if (p.convertor() != null) {
+                    addConvertor(p, excelHeadProperty);
+                }
                 excelColumnPropertyMap1.put(columnNum.value(), excelHeadProperty);
             }
         }
@@ -95,6 +109,22 @@ public class ExcelHeadProperty {
             this.columnPropertyList.add(excelHeadProperty);
         }
 
+    }
+
+    private void addConvertor(ExcelProperty p, ExcelColumnProperty excelHeadProperty){
+        try {
+            if (!p.convertor().equals(TypeConverter.class) && (p.convertor().isInterface() || Modifier.isAbstract(p.convertor().getModifiers()))) {
+                throw new ExcelAnalysisException("convertor type is wrong");
+            }
+
+            if (!p.convertor().equals(TypeConverter.class)) {
+                excelHeadProperty.setConverter((TypeConverter) ReflectUtil.newInstance(p.convertor()));
+            }
+        } catch (InstantiationException e) {
+            throw new ExcelAnalysisException("InstantiationException is happen : {}" , e);
+        } catch (IllegalAccessException e) {
+            throw new ExcelAnalysisException("IllegalAccessException is happen : {}" , e);
+        }
     }
 
     /**
@@ -155,7 +185,7 @@ public class ExcelHeadProperty {
     public List<CellRange> getCellRangeModels() {
         List<CellRange> cellRanges = new ArrayList<CellRange>();
         for (int i = 0; i < head.size(); i++) {
-            List<String> columnValues = head.get(i);
+            List<String> columnValues = head.get(i); // {中国，美国}
             for (int j = 0; j < columnValues.size(); j++) {
                 int lastRow = getLastRangNum(j, columnValues.get(j), columnValues);
                 int lastColumn = getLastRangNum(i, columnValues.get(j), getHeadByRowNum(j));

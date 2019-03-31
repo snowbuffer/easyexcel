@@ -25,6 +25,11 @@ public class ExcelColumnProperty implements Comparable<ExcelColumnProperty> {
      */
     private String format;
 
+    /**
+     * 类型转换器
+     */
+    private TypeConverter converter;
+
     public String getFormat() {
         return format;
     }
@@ -55,6 +60,14 @@ public class ExcelColumnProperty implements Comparable<ExcelColumnProperty> {
 
     public void setHead(List<String> head) {
         this.head = head;
+    }
+
+    public TypeConverter getConverter() {
+        return converter;
+    }
+
+    public void setConverter(TypeConverter converter) {
+        this.converter = converter;
     }
 
     public int compareTo(ExcelColumnProperty o) {

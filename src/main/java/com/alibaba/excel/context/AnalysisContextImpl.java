@@ -37,9 +37,21 @@ public class AnalysisContextImpl implements AnalysisContext {
 
     private boolean use1904WindowDate = false;
 
+    private boolean parseSuccess = true;
+
     @Override
     public void setUse1904WindowDate(boolean use1904WindowDate) {
         this.use1904WindowDate = use1904WindowDate;
+    }
+
+    @Override
+    public void setParseSuccess(boolean parseSuccess) {
+        this.parseSuccess = parseSuccess;
+    }
+
+    @Override
+    public boolean getParseSuccess() {
+        return this.parseSuccess ;
     }
 
     @Override

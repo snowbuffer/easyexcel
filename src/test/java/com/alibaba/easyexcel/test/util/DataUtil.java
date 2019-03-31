@@ -39,8 +39,8 @@ public class DataUtil {
         List<String> headCoulumn4 = new ArrayList<String>();
         List<String> headCoulumn5 = new ArrayList<String>();
 
-        headCoulumn1.add("第一列");headCoulumn1.add("第一列");headCoulumn1.add("第一列");
-        headCoulumn2.add("第一列");headCoulumn2.add("第一列");headCoulumn2.add("第一列");
+        headCoulumn1.add("第一列");headCoulumn1.add("第一列");headCoulumn1.add("第一列A");
+        headCoulumn2.add("第一列");headCoulumn2.add("第一列");headCoulumn2.add("第一列B");
 
         headCoulumn3.add("第二列");headCoulumn3.add("第二列");headCoulumn3.add("第二列");
         headCoulumn4.add("第三列");headCoulumn4.add("第三列2");headCoulumn4.add("第三列2");

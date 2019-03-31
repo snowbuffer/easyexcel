@@ -129,4 +129,16 @@ public interface AnalysisContext {
      * @param use1904WindowDate
      */
     void setUse1904WindowDate(boolean use1904WindowDate);
+
+    /**
+     * 解析文件是否成功
+     * @param parseSuccess
+     */
+    void setParseSuccess(boolean parseSuccess);
+
+    /**
+     * 解析文件状态
+     * @return
+     */
+    boolean getParseSuccess();
 }

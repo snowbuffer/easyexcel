@@ -1218,4 +1218,17 @@ public abstract class StringUtils {
         return arrayToDelimitedString(arr, ",");
     }
 
+    public static boolean isDigit(String source) {
+        if (isEmpty(source)) {
+            return false;
+        }
+
+        for (char item : source.toCharArray()) {
+            if (!Character.isDigit(item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

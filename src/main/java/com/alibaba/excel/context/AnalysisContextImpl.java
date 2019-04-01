@@ -169,10 +169,10 @@ public class AnalysisContextImpl implements AnalysisContext {
 
     @Override
     public void buildExcelHeadProperty(Class<? extends BaseRowModel> clazz, List<String> headOneRow) {
-        if (this.excelHeadProperty == null && (clazz != null || headOneRow != null)) {
+        if (this.excelHeadProperty == null && (clazz != null || headOneRow != null)) { // javaBeanHead
             this.excelHeadProperty = new ExcelHeadProperty(clazz, new ArrayList<List<String>>());
         }
-        if (this.excelHeadProperty.getHead() == null && headOneRow != null) {
+        if (this.excelHeadProperty.getHead() == null && headOneRow != null) { // basicHead
             this.excelHeadProperty.appendOneRow(headOneRow);
         }
     }

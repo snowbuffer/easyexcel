@@ -42,7 +42,7 @@ public class XlsSaxAnalyser extends BaseSaxAnalyser implements HSSFListener {
 
     @Override
     public List<Sheet> getSheets() {
-        execute();
+        execute();  // 这里执行execute 时候，还没有注册事件BaseSaxAnalyser.listeners还没有注册监听，因此直接解析，不转换bean
         return sheets;
     }
 
@@ -308,6 +308,12 @@ public class XlsSaxAnalyser extends BaseSaxAnalyser implements HSSFListener {
             Sheet sheet = analysisContext.getCurrentSheet();
 
             if ((sheet == null || sheet.getSheetNo() == sheetIndex) && notAllEmpty) {
+                if (sheet != null) {
+                    Sheet actualSheet = sheets.get(sheetIndex - 1);
+                    if (actualSheet != null) {
+                        sheet.setSheetName(actualSheet.getSheetName());
+                    }
+                }
                 notifyListeners(new OneRowAnalysisFinishEvent(records));
             }
             records.clear();

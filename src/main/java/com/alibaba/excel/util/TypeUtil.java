@@ -216,7 +216,34 @@ public class TypeUtil {
         return simpleDateFormat.format(cellValue);
     }
 
-    public static String getFieldStringValue(BeanMap beanMap, String fieldName, String format, TypeConverter converter) {
+    public static String getFieldStringValue(BeanMap beanMap,
+                                             String fieldName,
+                                             String format,
+                                             TypeConverter converter,
+                                             List<String> head) {
+
+        Map<String, RowErrorModel.CellInfo> errorMap = (Map<String, RowErrorModel.CellInfo>) beanMap.get("errorMap");
+
+        // 如果是 operateResult 操作结果列
+        if (fieldName.equalsIgnoreCase("operateResult")) {
+            Integer lineNumber = (Integer) beanMap.get("lineNumber");
+            // 如果存在转换器，直接走转换器
+            if (converter != null) {
+                List<Object> list = new LinkedList<Object>();
+                list.add(lineNumber);
+                list.add(errorMap);
+                return converter.convertToWrite(list);
+            }
+            return errorMap.toString();
+        }
+
+        if (errorMap != null) {
+            RowErrorModel.CellInfo cellInfo = errorMap.get(head.get(head.size() - 1));
+            if (cellInfo != null) {
+                return (String)cellInfo.getSource();
+            }
+        }
+
         String cellValue = null;
         Object value = beanMap.get(fieldName);
         if (value != null) {

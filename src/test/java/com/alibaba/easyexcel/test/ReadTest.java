@@ -77,7 +77,7 @@ public class ReadTest {
      */
     @Test
     public void saxReadSheetsV2007() throws IOException {
-        InputStream inputStream = FileUtil.getResourcesFileInputStream("2007.xlsx");
+        InputStream inputStream = FileUtil.getResourcesFileInputStream("2003.xls");
         ExcelListener excelListener = new ExcelListener();
         ExcelReader excelReader = EasyExcelFactory.getReader(inputStream,excelListener);
         List<Sheet> sheets = excelReader.getSheets(); // 用于读取所有的sheet
@@ -147,7 +147,7 @@ public class ReadTest {
      */
     @Test
     public void saxReadJavaModelV2003() throws IOException {
-        InputStream inputStream = FileUtil.getResourcesFileInputStream("import_student_templet.xls");
+        InputStream inputStream = FileUtil.getResourcesFileInputStream("import_student_templet.xlsx");
         ExcelListener excelListener = new ExcelListener();
         EasyExcelFactory.readBySax(inputStream, new Sheet(1, 1, Student.class), excelListener);
         inputStream.close();

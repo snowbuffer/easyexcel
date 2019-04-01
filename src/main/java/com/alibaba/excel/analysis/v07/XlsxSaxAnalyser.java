@@ -69,8 +69,11 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
     @Override
     protected void execute() {
         Sheet sheetParam = analysisContext.getCurrentSheet();
+        // 如果是读取一个sheet, 且sheetNo比实际的sheetSourceList 要小
         if (sheetParam != null && sheetParam.getSheetNo() > 0 && sheetSourceList.size() >= sheetParam.getSheetNo()) {
-            InputStream sheetInputStream = sheetSourceList.get(sheetParam.getSheetNo() - 1).getInputStream();
+            SheetSource actualSheet = sheetSourceList.get(sheetParam.getSheetNo() - 1);
+            sheetParam.setSheetName(actualSheet.getSheetName());
+            InputStream sheetInputStream = actualSheet.getInputStream();
             parseXmlSource(sheetInputStream);
 
         } else {
@@ -104,6 +107,7 @@ public class XlsxSaxAnalyser extends BaseSaxAnalyser {
 
     @Override
     public List<Sheet> getSheets() {
+        // 实例化对象时候，就已经知道了sheetList
         List<Sheet> sheets = new ArrayList<Sheet>();
         int i = 1;
         for (SheetSource sheetSource : sheetSourceList) {

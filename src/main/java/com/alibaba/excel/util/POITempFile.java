@@ -23,9 +23,14 @@ public class POITempFile {
         }
         File directory = new File(tmpDir, POIFILES);
         if (!directory.exists()) {
+            // linux下临时目录是否风险
             syncCreatePOIFilesDirectory(directory);
         }
 
+    }
+
+    public static void main(String[] args){
+      System.out.println(System.getProperty(JAVA_IO_TMPDIR));
     }
 
     /**

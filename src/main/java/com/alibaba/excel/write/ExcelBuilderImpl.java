@@ -3,18 +3,13 @@ package com.alibaba.excel.write;
 import com.alibaba.excel.context.WriteContext;
 import com.alibaba.excel.event.WriteHandler;
 import com.alibaba.excel.exception.ExcelGenerateException;
-import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.ExcelColumnProperty;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.metadata.Table;
 import com.alibaba.excel.support.ExcelTypeEnum;
-import com.alibaba.excel.util.CollectionUtils;
-import com.alibaba.excel.util.POITempFile;
-import com.alibaba.excel.util.TypeUtil;
-import com.alibaba.excel.util.WorkBookUtil;
+import com.alibaba.excel.util.*;
 import net.sf.cglib.beans.BeanMap;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -113,13 +108,19 @@ public class ExcelBuilderImpl implements ExcelBuilder {
         int i = 0;
         BeanMap beanMap = BeanMap.create(oneRowData);
         for (ExcelColumnProperty excelHeadProperty : context.getExcelHeadProperty().getColumnPropertyList()) {
-            BaseRowModel baseRowModel = (BaseRowModel)oneRowData;
+//            BaseRowModel baseRowModel = (BaseRowModel)oneRowData;
             String cellValue = TypeUtil.getFieldStringValue(beanMap, excelHeadProperty.getField().getName(),
-                excelHeadProperty.getFormat(), excelHeadProperty.getConverter());
-            CellStyle cellStyle = baseRowModel.getStyle(i) != null ? baseRowModel.getStyle(i)
-                : context.getCurrentContentStyle();
-            Cell cell = WorkBookUtil.createCell(row, i, cellStyle, cellValue,
-                TypeUtil.isNum(excelHeadProperty.getField()));
+                excelHeadProperty.getFormat(), excelHeadProperty.getConverter(), excelHeadProperty.getHead());
+//            CellStyle cellStyle = baseRowModel.getStyle(i) != null ? baseRowModel.getStyle(i)
+//                : context.getCurrentContentStyle();
+
+            Boolean num = TypeUtil.isNum(excelHeadProperty.getField());
+            if (num && !StringUtils.isDigit(cellValue)) {
+                // 格式不正确导致的Field 与 cellValue不匹配
+                num = false;
+            }
+            Cell cell = WorkBookUtil.createCell(row, i, null, cellValue,
+                    num);
             if (null != context.getAfterWriteHandler()) {
                 context.getAfterWriteHandler().cell(i, cell);
             }

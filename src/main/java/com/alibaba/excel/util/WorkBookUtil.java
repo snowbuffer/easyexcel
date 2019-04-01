@@ -2,6 +2,8 @@ package com.alibaba.excel.util;
 
 import com.alibaba.excel.support.ExcelTypeEnum;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -18,14 +20,15 @@ import static com.alibaba.excel.util.StyleUtil.buildSheetStyle;
  */
 public class WorkBookUtil {
 
-    public static Workbook createWorkBook(InputStream templateInputStream, ExcelTypeEnum excelType) throws IOException {
+    public static Workbook createWorkBook(InputStream templateInputStream, ExcelTypeEnum excelType) throws IOException, InvalidFormatException {
         Workbook workbook;
         if (ExcelTypeEnum.XLS.equals(excelType)) {
             workbook = (templateInputStream == null) ? new HSSFWorkbook() : new HSSFWorkbook(
                 new POIFSFileSystem(templateInputStream));
         } else {
             workbook = (templateInputStream == null) ? new SXSSFWorkbook(500) : new SXSSFWorkbook(
-                new XSSFWorkbook(templateInputStream));
+                new XSSFWorkbook(OPCPackage.open(templateInputStream)));
+
         }
         return workbook;
     }
@@ -61,7 +64,7 @@ public class WorkBookUtil {
 
     public static Cell createCell(Row row, int colNum, CellStyle cellStyle, Object cellValue, Boolean isNum) {
         Cell cell = row.createCell(colNum);
-        cell.setCellStyle(cellStyle);
+//        cell.setCellStyle(cellStyle);
         if (null != cellValue) {
             if (isNum) {
                 cell.setCellValue(Double.parseDouble(cellValue.toString()));

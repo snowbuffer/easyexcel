@@ -11,11 +11,12 @@ import java.util.Map;
 public class Sheet {
 
     /**
+     *  head列的函数 0 表示没有行，直接数据项，依次类推
      */
     private int headLineMun;
 
     /**
-     * Starting from 1
+     * Starting from 1  读取的时候，通过此字段来读， sheetName不起作用
      */
     private int sheetNo;
 
@@ -47,7 +48,7 @@ public class Sheet {
     private Boolean autoWidth = Boolean.FALSE;
 
     /**
-     *
+     * 写操作使用此字段
      */
     private int startRow = 0;
 
@@ -56,7 +57,7 @@ public class Sheet {
         this.sheetNo = sheetNo;
     }
 
-    public Sheet(int sheetNo, int headLineMun) {
+    public Sheet(int sheetNo, int headLineMun) { // head列的函数 0 表示没有行，直接数据项，依次类推
         this.sheetNo = sheetNo;
         this.headLineMun = headLineMun;
     }

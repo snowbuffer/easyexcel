@@ -8,6 +8,7 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.CollectionUtils;
 import com.alibaba.excel.util.StyleUtil;
 import com.alibaba.excel.util.WorkBookUtil;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -91,17 +92,26 @@ public class WriteContext {
 
     private WriteHandler afterWriteHandler;
 
+    /**
+     * 写操作时候，是否使用内置的样式 默认值为true
+     * 目前已禁止内部模板 暂无外部入口设置此选项
+     */
+    private boolean writeWithDefaultSettings = false;
+
+    private boolean writeWithTemplateFile;
+
     public WriteHandler getAfterWriteHandler() {
         return afterWriteHandler;
     }
 
     public WriteContext(InputStream templateInputStream, OutputStream out, ExcelTypeEnum excelType,
-                        boolean needHead, WriteHandler afterWriteHandler) throws IOException {
+                        boolean needHead, WriteHandler afterWriteHandler) throws IOException, InvalidFormatException {
         this.needHead = needHead;
         this.outputStream = out;
         this.afterWriteHandler = afterWriteHandler;
         this.workbook = WorkBookUtil.createWorkBook(templateInputStream, excelType);
         this.defaultCellStyle = StyleUtil.buildDefaultCellStyle(this.workbook);
+        this.writeWithTemplateFile = templateInputStream != null;
 
     }
 
@@ -120,7 +130,11 @@ public class WriteContext {
                     this.afterWriteHandler.sheet(sheet.getSheetNo(), currentSheet);
                 }
             }
-            buildSheetStyle(currentSheet, sheet.getColumnWidthMap());
+
+            if (writeWithDefaultSettings) {
+                buildSheetStyle(currentSheet, sheet.getColumnWidthMap());
+            }
+
             /** **/
             this.initCurrentSheet(sheet);
         }
@@ -132,9 +146,14 @@ public class WriteContext {
         /** **/
         initExcelHeadProperty(sheet.getHead(), sheet.getClazz());
 
-        initTableStyle(sheet.getTableStyle());
+        if (writeWithDefaultSettings) {
+            initTableStyle(sheet.getTableStyle());
 
-        initTableHead();
+        }
+
+        if (!writeWithTemplateFile) {
+            initTableHead();
+        }
 
     }
 
@@ -219,8 +238,15 @@ public class WriteContext {
             cleanCurrentTable();
             this.currentTable = table;
             this.initExcelHeadProperty(table.getHead(), table.getClazz());
-            this.initTableStyle(table.getTableStyle());
-            this.initTableHead();
+
+            if (writeWithDefaultSettings) {
+                this.initTableStyle(table.getTableStyle());
+            }
+
+            if (!writeWithTemplateFile) {
+                this.initTableHead();
+            }
+
         }
 
     }

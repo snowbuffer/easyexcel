@@ -1,9 +1,11 @@
 package com.alibaba.excel.metadata;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.converter.OperateResultCoverter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Description:  行解析对应校验结果
@@ -14,6 +16,8 @@ import java.util.Map;
  */
 public class RowErrorModel extends BaseRowModel{
 
+    public static final String INTERNAL_STRING = "INTERNAL_";
+
     // 行号
     private Integer lineNumber;
 
@@ -21,9 +25,12 @@ public class RowErrorModel extends BaseRowModel{
     private Map<String, CellInfo> errorMap = new HashMap<String, CellInfo>();
 
     // 操作结果
-    @ExcelProperty(index = Integer.MAX_VALUE, value = {"===操作结果==="})
+    @ExcelProperty(index = Integer.MAX_VALUE, value = {"===操作结果==="}, convertor = OperateResultCoverter.class)
     private String operateResult;
 
+    public void addBizError(String errorMsg) {
+        errorMap.put(INTERNAL_STRING + UUID.randomUUID().toString(), CellInfo.newInstance(null, errorMsg));
+    }
 
     public Integer getLineNumber() {
         return lineNumber;

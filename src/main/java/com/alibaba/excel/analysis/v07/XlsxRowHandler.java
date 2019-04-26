@@ -129,10 +129,15 @@ public class XlsxRowHandler extends DefaultHandler {
 
     private void endRow(String name) {
         if (name.equals(ROW_TAG)) {
+            for (int i = 0; i < curRowContent.length; i++) {
+                if (curRowContent[i] == null) {
+                    continue;
+                }
+                curRowContent[i] = curRowContent[i].trim();
+            }
             registerCenter.notifyListeners(new OneRowAnalysisFinishEvent(curRowContent,curCol));
             curRowContent = new String[20];
         }
     }
-
 }
 

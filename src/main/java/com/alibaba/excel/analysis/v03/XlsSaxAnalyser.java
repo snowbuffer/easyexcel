@@ -314,6 +314,13 @@ public class XlsSaxAnalyser extends BaseSaxAnalyser implements HSSFListener {
                         sheet.setSheetName(actualSheet.getSheetName());
                     }
                 }
+                for (int i = 0; i < records.size(); i++) {
+                    String item = records.get(i);
+                    if (item == null) {
+                        continue;
+                    }
+                    records.set(i, item.trim());
+                }
                 notifyListeners(new OneRowAnalysisFinishEvent(records));
             }
             records.clear();

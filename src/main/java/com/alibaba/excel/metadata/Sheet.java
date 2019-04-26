@@ -11,7 +11,7 @@ import java.util.Map;
 public class Sheet {
 
     /**
-     *  head列的函数 0 表示没有行，直接数据项，依次类推
+     *  head列的行数 0 表示没有行，直接数据项，依次类推
      */
     private int headLineMun;
 

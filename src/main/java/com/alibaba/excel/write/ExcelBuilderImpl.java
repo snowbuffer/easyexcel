@@ -2,20 +2,23 @@ package com.alibaba.excel.write;
 
 import com.alibaba.excel.context.WriteContext;
 import com.alibaba.excel.event.WriteHandler;
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.exception.ExcelGenerateException;
-import com.alibaba.excel.metadata.ExcelColumnProperty;
-import com.alibaba.excel.metadata.Sheet;
-import com.alibaba.excel.metadata.Table;
+import com.alibaba.excel.metadata.*;
+import com.alibaba.excel.style.LastColumnErrorCustomCellStyle;
+import com.alibaba.excel.style.RowErrorCustomCellStyle;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.*;
 import net.sf.cglib.beans.BeanMap;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -108,18 +111,39 @@ public class ExcelBuilderImpl implements ExcelBuilder {
         int i = 0;
         BeanMap beanMap = BeanMap.create(oneRowData);
         for (ExcelColumnProperty excelHeadProperty : context.getExcelHeadProperty().getColumnPropertyList()) {
-//            BaseRowModel baseRowModel = (BaseRowModel)oneRowData;
+            RowErrorModel baseRowModel = (RowErrorModel)oneRowData;
             String cellValue = TypeUtil.getFieldStringValue(beanMap, excelHeadProperty.getField().getName(),
                 excelHeadProperty.getFormat(), excelHeadProperty.getConverter(), excelHeadProperty.getHead());
 //            CellStyle cellStyle = baseRowModel.getStyle(i) != null ? baseRowModel.getStyle(i)
 //                : context.getCurrentContentStyle();
+
+            // 单元格标色，如果业务方没有给定对应的列名称，很难标识具体的单元格，因此这里改用行标识
+            CustomCellStyle customCellStyle;
+            if (baseRowModel.getErrorMap().size() == 0) {
+                customCellStyle = getCellStyle(excelHeadProperty.getCommonCellStyleClass());
+            } else {
+                customCellStyle = getCellStyle(excelHeadProperty.getErrorCellStyleClass());
+            }
+            CellStyle currentCellStyle = null;
+            if (customCellStyle != null) {
+                currentCellStyle = customCellStyle.getStyle(context.getWorkbook());
+            }
+
+            // 错误场景下行样式
+//            CustomCellStyle customCellStyle = null;
+//            if (baseRowModel.getErrorMap().size() != 0) {
+//                customCellStyle = new RowErrorCustomCellStyle();
+//                if (excelHeadProperty.getField().getName().equalsIgnoreCase("operateResult")) {
+//                    customCellStyle = new LastColumnErrorCustomCellStyle();
+//                }
+//            }
 
             Boolean num = TypeUtil.isNum(excelHeadProperty.getField());
             if (num && !StringUtils.isDigit(cellValue)) {
                 // 格式不正确导致的Field 与 cellValue不匹配
                 num = false;
             }
-            Cell cell = WorkBookUtil.createCell(row, i, null, cellValue,
+            Cell cell = WorkBookUtil.createCell(row, i, currentCellStyle, cellValue,
                     num);
             if (null != context.getAfterWriteHandler()) {
                 context.getAfterWriteHandler().cell(i, cell);
@@ -127,6 +151,24 @@ public class ExcelBuilderImpl implements ExcelBuilder {
             i++;
         }
 
+    }
+
+    private CustomCellStyle getCellStyle(Class<? extends CustomCellStyle> customCellStyle) {
+        try {
+            if (!customCellStyle.equals(CustomCellStyle.class) && (customCellStyle.isInterface() || Modifier.isAbstract(customCellStyle.getModifiers()))) {
+                throw new ExcelAnalysisException("customCellStyle type is wrong");
+            }
+
+            if (!customCellStyle.equals(CustomCellStyle.class)) {
+                Class<? extends CustomCellStyle> custom = customCellStyle;
+                return custom.newInstance();
+            }
+        } catch (InstantiationException e) {
+            throw new ExcelAnalysisException("InstantiationException is happen : {}" , e);
+        } catch (IllegalAccessException e) {
+            throw new ExcelAnalysisException("IllegalAccessException is happen : {}" , e);
+        }
+        return null;
     }
 
     private void addOneRowOfDataToExcel(Object oneRowData, int n) {

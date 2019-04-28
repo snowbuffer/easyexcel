@@ -64,7 +64,9 @@ public class WorkBookUtil {
 
     public static Cell createCell(Row row, int colNum, CellStyle cellStyle, Object cellValue, Boolean isNum) {
         Cell cell = row.createCell(colNum);
-//        cell.setCellStyle(cellStyle);
+        if (cellStyle != null) {
+            cell.setCellStyle(cellStyle);
+        }
         if (null != cellValue) {
             if (isNum) {
                 cell.setCellValue(Double.parseDouble(cellValue.toString()));

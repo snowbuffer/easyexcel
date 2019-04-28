@@ -90,6 +90,8 @@ public class ExcelHeadProperty {
             if (p.convertor() != null) {
                 addConvertor(p, excelHeadProperty);
             }
+            excelHeadProperty.setCommonCellStyleClass(p.commonCellStyle());
+            excelHeadProperty.setErrorCellStyleClass(p.errorCellStyle());
             excelColumnPropertyMap1.put(p.index(), excelHeadProperty);
         } else {
             ExcelColumnNum columnNum = f.getAnnotation(ExcelColumnNum.class);
@@ -98,9 +100,6 @@ public class ExcelHeadProperty {
                 excelHeadProperty.setField(f);
                 excelHeadProperty.setIndex(columnNum.value());
                 excelHeadProperty.setFormat(columnNum.format());
-                if (p.convertor() != null) {
-                    addConvertor(p, excelHeadProperty);
-                }
                 excelColumnPropertyMap1.put(columnNum.value(), excelHeadProperty);
             }
         }

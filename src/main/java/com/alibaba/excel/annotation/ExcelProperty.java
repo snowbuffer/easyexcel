@@ -1,6 +1,9 @@
 package com.alibaba.excel.annotation;
 
+import com.alibaba.excel.metadata.CustomCellStyle;
 import com.alibaba.excel.metadata.TypeConverter;
+import com.alibaba.excel.util.StyleUtil;
+import org.apache.poi.ss.usermodel.CellStyle;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -43,4 +46,9 @@ public @interface ExcelProperty {
       */
      Class<? extends TypeConverter> convertor() default TypeConverter.class;
 
+     // 暂时弃用 业务异常场景下，需要业务方指定字段 ，业务方改动大
+     Class<? extends CustomCellStyle> errorCellStyle() default CustomCellStyle.class;
+
+     // 暂时弃用 业务异常场景下，需要业务方指定字段 ，业务方改动大
+     Class<? extends CustomCellStyle> commonCellStyle() default CustomCellStyle.class;
 }

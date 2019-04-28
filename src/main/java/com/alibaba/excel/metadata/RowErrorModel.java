@@ -2,6 +2,7 @@ package com.alibaba.excel.metadata;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.converter.OperateResultCoverter;
+import com.alibaba.excel.style.LastColumnErrorCustomCellStyle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class RowErrorModel extends BaseRowModel{
     private Map<String, CellInfo> errorMap = new HashMap<String, CellInfo>();
 
     // 操作结果
-    @ExcelProperty(index = Integer.MAX_VALUE, value = {"===操作结果==="}, convertor = OperateResultCoverter.class)
+    @ExcelProperty(index = Integer.MAX_VALUE, value = {"===操作结果==="}, convertor = OperateResultCoverter.class, errorCellStyle = LastColumnErrorCustomCellStyle.class)
     private String operateResult;
 
     public void addBizError(String errorMsg) {

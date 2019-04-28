@@ -1,5 +1,7 @@
 package com.alibaba.excel.metadata;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,16 @@ public class ExcelColumnProperty implements Comparable<ExcelColumnProperty> {
      * 类型转换器
      */
     private TypeConverter converter;
+
+    /**
+     * 单元格样式 错误场景样式
+     */
+    private Class<? extends CustomCellStyle> errorCellStyleClass;
+
+    /**
+     * 单元格样式 常规场景样式
+     */
+    private Class<? extends CustomCellStyle> commonCellStyleClass;
 
     public String getFormat() {
         return format;
@@ -68,6 +80,22 @@ public class ExcelColumnProperty implements Comparable<ExcelColumnProperty> {
 
     public void setConverter(TypeConverter converter) {
         this.converter = converter;
+    }
+
+    public Class<? extends CustomCellStyle> getErrorCellStyleClass() {
+        return errorCellStyleClass;
+    }
+
+    public void setErrorCellStyleClass(Class<? extends CustomCellStyle> errorCellStyleClass) {
+        this.errorCellStyleClass = errorCellStyleClass;
+    }
+
+    public Class<? extends CustomCellStyle> getCommonCellStyleClass() {
+        return commonCellStyleClass;
+    }
+
+    public void setCommonCellStyleClass(Class<? extends CustomCellStyle> commonCellStyleClass) {
+        this.commonCellStyleClass = commonCellStyleClass;
     }
 
     public int compareTo(ExcelColumnProperty o) {

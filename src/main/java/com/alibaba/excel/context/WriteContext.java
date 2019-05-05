@@ -110,7 +110,7 @@ public class WriteContext {
         this.outputStream = out;
         this.afterWriteHandler = afterWriteHandler;
         this.workbook = WorkBookUtil.createWorkBook(templateInputStream, excelType);
-        this.defaultCellStyle = StyleUtil.buildDefaultCellStyle(this.workbook);
+//        this.defaultCellStyle = StyleUtil.buildDefaultCellStyle(this.workbook); // 如果后续需要同一个默认样式，可以激活此行
         this.writeWithTemplateFile = templateInputStream != null;
 
     }

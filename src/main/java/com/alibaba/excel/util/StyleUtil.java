@@ -32,6 +32,14 @@ public class StyleUtil {
         return newCellStyle;
     }
 
+    public static CellStyle buildCurrentTitleCellStyle(Workbook workbook) {
+        CellStyle newCellStyle = workbook.createCellStyle();
+        newCellStyle.setWrapText(true);
+        newCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        newCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        return newCellStyle;
+    }
+
     /**
      *
      * @param workbook

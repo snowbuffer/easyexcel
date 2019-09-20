@@ -29,8 +29,14 @@ public class Sheet {
     private Class<? extends BaseRowModel> clazz;
 
     /**
+     * 每个单元格是一列
      */
     private List<List<String>> head;
+
+    /**
+     * title列，常用语多表头
+     */
+    private List<List<Object>> titleList;
 
     /**
      *
@@ -83,6 +89,14 @@ public class Sheet {
 
     public void setHead(List<List<String>> head) {
         this.head = head;
+    }
+
+    public List<List<Object>> getTitleList() {
+        return titleList;
+    }
+
+    public void setTitleList(List<List<Object>> titleList) {
+        this.titleList = titleList;
     }
 
     public Class<? extends BaseRowModel> getClazz() {

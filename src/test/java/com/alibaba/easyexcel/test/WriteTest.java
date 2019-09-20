@@ -11,12 +11,69 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.alibaba.easyexcel.test.util.DataUtil.*;
 
 public class WriteTest {
+
+    @Test
+    public void writeNew() throws IOException {
+        OutputStream out = new FileOutputStream("E:/2007_new6.xlsx");
+        ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX, true);
+        for (int j = 1; j <= 50; j++) {
+            com.alibaba.excel.metadata.Sheet sheet = new com.alibaba.excel.metadata.Sheet(j, 1);
+
+            PointManager manager = new PointManager();
+            manager.addPoint(new Point(3, 7, 1, 4, 5));
+            manager.addPoint(new Point(2, 1, 2, 1, "2"));
+            manager.addPoint(new Point(2, 3, 2, 3, "3"));
+            manager.addPoint(new Point(2, 5, 3, 1, "4"));
+            manager.addPoint(new Point(11, 5, 3, 1, "7"));
+            manager.addPoint(new Point(1, 1, 7, 1, "1"));
+            manager.addPoint(new Point(12, 2, 4, 2, "8"));
+            manager.addPoint(new Point(6, 2, 4, 3, "6"));
+            manager.calc();
+            List<List<Object>> titleList = manager.getTitleList();
+            sheet.setTitleList(titleList);
+
+            List<List<String>> headList = new ArrayList<List<String>>();
+            for (int i = 0; i < 10; i++) {
+                List<String> temp =new ArrayList<String>();
+                temp.add("title_" + i);
+                headList.add(temp);
+            }
+            sheet.setSheetName("sheet_" + j);
+            sheet.setHead(headList);
+            sheet.setStartRow(0);
+
+            List<List<Object>> allDataList = new ArrayList<List<Object>>();
+            for (int m = 1; m <= 200; m++) {
+                List<Object> tempList=  new ArrayList<Object>();
+                for (int i = 0; i < 10; i++) {
+                    tempList.add(sheet.getSheetName() + "_r_" + m + "_data_" + i);
+                }
+                allDataList.add(tempList);
+            }
+            writer.write1(allDataList, sheet);
+
+            manager.getPointList().forEach(point -> {
+                List<Integer> pointRangeList = point.getPointRangeList();
+
+                writer.merge(
+                        pointRangeList.get(0),
+                        pointRangeList.get(1),
+                        pointRangeList.get(2),
+                        pointRangeList.get(3));
+            });
+        }
+        writer.finish();
+        out.close();
+    }
+
 
     @Test
     public void writeV2007() throws IOException {

@@ -29,12 +29,12 @@ import static com.alibaba.excel.util.StyleUtil.buildSheetStyle;
 public class WriteContext {
 
     /***
-     * The sheet currently written
+     * The sheet currently written  原始poi sheet
      */
     private Sheet currentSheet;
 
     /**
-     * current param
+     * current param  自定义sheet
      */
     private com.alibaba.excel.metadata.Sheet currentSheetParam;
 
@@ -76,6 +76,11 @@ public class WriteContext {
     /**
      * Current table head  style
      */
+    private CellStyle currentTitleCellStyle;
+
+    /**
+     * Current table head  style
+     */
     private CellStyle currentHeadCellStyle;
 
     /**
@@ -112,6 +117,7 @@ public class WriteContext {
         this.workbook = WorkBookUtil.createWorkBook(templateInputStream, excelType);
 //        this.defaultCellStyle = StyleUtil.buildDefaultCellStyle(this.workbook); // 如果后续需要同一个默认样式，可以激活此行
         this.writeWithTemplateFile = templateInputStream != null;
+        this.currentTitleCellStyle = StyleUtil.buildCurrentTitleCellStyle(this.workbook);
 
     }
 
@@ -152,9 +158,36 @@ public class WriteContext {
         }
 
         if (!writeWithTemplateFile) {
+            initTitleHead();
             initTableHead();
         }
 
+    }
+
+    private void initTitleHead() {
+        int startRow = currentSheet.getLastRowNum();
+        if (startRow > 0) {
+            startRow += 4;
+        } else {
+            startRow = currentSheetParam.getStartRow();
+        }
+        List<List<Object>> titleList = currentSheetParam.getTitleList();
+        int rowSize;
+        if (titleList != null && titleList.size() > 0) {
+            rowSize = titleList.size();
+            for (int i = 0; i < rowSize; i++) {
+                Row row = WorkBookUtil.createRow(currentSheet, i + startRow);
+                List<Object> columnDataList = titleList.get(i);
+                int columnSize = columnDataList.size();
+                for (int col = 0; col < columnSize; col++) {
+                    Object o = columnDataList.get(col);
+                    Cell cell = WorkBookUtil.createCell(row, col, getCurrentTitleCellStyle(), o == null ? null : o.toString());
+                    if (null != afterWriteHandler) {
+                        this.afterWriteHandler.cell(col, cell);
+                    }
+                }
+            }
+        }
     }
 
     private void cleanCurrentSheet() {
@@ -180,10 +213,15 @@ public class WriteContext {
     public void initTableHead() {
         if (needHead && null != excelHeadProperty && !CollectionUtils.isEmpty(excelHeadProperty.getHead())) {
             int startRow = currentSheet.getLastRowNum();
-            if (startRow > 0) {
-                startRow += 4;
+            List<List<Object>> titleList = currentSheetParam.getTitleList();
+            if (titleList == null || titleList.size() <= 0) {
+                if (startRow > 0) {
+                    startRow += 4;
+                } else {
+                    startRow = currentSheetParam.getStartRow();
+                }
             } else {
-                startRow = currentSheetParam.getStartRow();
+                startRow = startRow + 1; // 新的空白行
             }
             addMergedRegionToCurrentSheet(startRow);
             int i = startRow;
@@ -229,6 +267,7 @@ public class WriteContext {
         this.excelHeadProperty = null;
         this.currentHeadCellStyle = null;
         this.currentContentCellStyle = null;
+        this.currentTitleCellStyle = null;
         this.currentTable = null;
 
     }
@@ -293,6 +332,14 @@ public class WriteContext {
 
     public CellStyle getCurrentContentStyle() {
         return this.currentContentCellStyle;
+    }
+
+    public CellStyle getCurrentTitleCellStyle() {
+        return currentTitleCellStyle;
+    }
+
+    public void setCurrentTitleCellStyle(CellStyle currentTitleCellStyle) {
+        this.currentTitleCellStyle = currentTitleCellStyle;
     }
 
     public Workbook getWorkbook() {

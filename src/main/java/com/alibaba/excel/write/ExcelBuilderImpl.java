@@ -5,8 +5,6 @@ import com.alibaba.excel.event.WriteHandler;
 import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.exception.ExcelGenerateException;
 import com.alibaba.excel.metadata.*;
-import com.alibaba.excel.style.LastColumnErrorCustomCellStyle;
-import com.alibaba.excel.style.RowErrorCustomCellStyle;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.*;
 import net.sf.cglib.beans.BeanMap;
@@ -20,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jipengfei
@@ -91,6 +90,19 @@ public class ExcelBuilderImpl implements ExcelBuilder {
         } catch (IOException e) {
             throw new ExcelGenerateException("IO error", e);
         }
+    }
+
+    @Override
+    public void setColumnWidth(Map<Integer, Integer> columnWidthMap, Integer padding) {
+        int maxWidth = 255 * 256;
+        int actualMaxWidthExcludePadding = maxWidth - padding - 10;
+        columnWidthMap.forEach((key,width) -> {
+            int length = width * 256;
+            if (length > actualMaxWidthExcludePadding){
+                length = actualMaxWidthExcludePadding ;
+            }
+            context.getCurrentSheet().setColumnWidth(key, length + padding);
+        });
     }
 
     private void addBasicTypeToExcel(List<Object> oneRowData, Row row) {

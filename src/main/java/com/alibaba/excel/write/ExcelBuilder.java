@@ -4,6 +4,7 @@ import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.metadata.Table;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jipengfei
@@ -49,4 +50,6 @@ public interface ExcelBuilder {
      * Close io
      */
     void finish();
+
+    void setColumnWidth(Map<Integer, Integer> columnWidthMap, Integer padding);
 }

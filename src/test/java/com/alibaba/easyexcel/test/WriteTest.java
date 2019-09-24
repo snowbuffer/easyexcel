@@ -69,6 +69,18 @@ public class WriteTest {
                         pointRangeList.get(2),
                         pointRangeList.get(3));
             });
+            Map<Integer,Integer> columnWidthMap = new HashMap<>();
+            columnWidthMap.put(0, 10);
+            columnWidthMap.put(1, 20);
+            columnWidthMap.put(2, 10);
+            columnWidthMap.put(3, 20);
+            columnWidthMap.put(4, 10);
+            columnWidthMap.put(5, 20);
+            columnWidthMap.put(6, 10);
+            columnWidthMap.put(7, 20);
+            columnWidthMap.put(8, 10);
+            columnWidthMap.put(9, 20);
+            writer.setColumnWidth(columnWidthMap, 10);
         }
         writer.finish();
         out.close();

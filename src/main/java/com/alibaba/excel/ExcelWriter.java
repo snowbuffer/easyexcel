@@ -12,6 +12,7 @@ import com.alibaba.excel.write.ExcelBuilderImpl;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Excel Writer This tool is used to write data out to Excel via POI.
@@ -185,5 +186,9 @@ public class ExcelWriter {
      */
     public void finish() {
         excelBuilder.finish();
+    }
+
+    public void setColumnWidth(Map<Integer, Integer> columnWidth, Integer padding) {
+        excelBuilder.setColumnWidth(columnWidth, padding);
     }
 }
